@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en" class=""><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Naptune</title><meta name="description" content="Soft ambient noise to help you sleep: rain, ocean, wind and more, with a sleep timer.">
+<meta name="theme-color" content="#0b0d1a"><link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Naptune">
+<link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#0e1117;--panel:#161b24;--panel2:#1d2430;--line:#2a3342;--text:#e8edf5;--dim:#98a3b5;--accent:#6d7cff;--accent2:#a78bfa;--good:#3ecf8e;--bad:#ff6b6b;--warn:#ffc857;--r:16px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:light){:root.auto{--bg:#f4f6fa;--panel:#fff;--panel2:#eef1f6;--line:#d9dfe9;--text:#161b24;--dim:#5b6678}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:var(--safe-t) 0 var(--safe-b);-webkit-text-size-adjust:100%}
+h1,h2,h3{margin:0;line-height:1.2}h1{font-size:22px}h2{font-size:18px}h3{font-size:15px}
+a{color:var(--accent)}button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:14px 16px 90px}
+.top{display:flex;align-items:center;gap:12px;padding:6px 0 14px}.top .logo{width:38px;height:38px;border-radius:10px}.top .grow{flex:1}.sub{color:var(--dim);font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0 0 12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>label.f{min-width:130px}.grow{flex:1}.col{display:flex;flex-direction:column;gap:8px}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer}.btn.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.btn.small{padding:6px 11px;font-size:14px;border-radius:10px}.btn.danger{background:var(--bad)}.btn:active{transform:scale(.97)}
+input,select,textarea{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%}input[type=range]{padding:0;accent-color:var(--accent)}input[type=checkbox]{width:auto}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--dim)}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:12px;color:var(--dim);margin:0 6px 6px 0;cursor:pointer}.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tabs{display:flex;gap:6px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5;overflow-x:auto}.tabs button{flex:1;min-width:max-content;background:var(--panel);border:1px solid var(--line);color:var(--dim);border-radius:12px;padding:9px 14px;font-weight:600;cursor:pointer}.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.big{font-size:38px;font-weight:800;letter-spacing:-.02em}.muted{color:var(--dim)}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+.modal{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.on{display:flex}.sheet{background:var(--panel);border-radius:20px 20px 0 0;width:100%;max-width:640px;max-height:88vh;overflow:auto;padding:16px 16px calc(20px + var(--safe-b))}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:20px}}
+.toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:10px 16px;border-radius:12px;z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}.toast.on{opacity:1}
+table{border-collapse:collapse;width:100%}th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}th{color:var(--dim);font-weight:600}
+.bar{height:10px;border-radius:6px;background:var(--panel2);overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px}
+.foot{color:var(--dim);font-size:12px;text-align:center;padding:20px 0}
+</style></head><body>
+
+<div class="wrap" id="app">
+ <div class="top"><img class="logo" src="icon-192.png" alt=""><div class="grow"><h1>Naptune</h1><div class="sub">Soft ambient sound to sleep to</div></div><button class="btn small ghost" id="btnDim" title="Black screen with a faint clock">Sleep screen</button></div>
+ <div class="card" style="text-align:center">
+  <button class="btn" id="btnPlay" style="width:96px;height:96px;border-radius:50%;font-size:34px;padding:0">&#9654;</button>
+  <div class="sub" id="status" style="margin-top:10px">Pick a few sounds, then press play</div>
+  <label class="f" style="margin-top:12px">Master volume<input type="range" id="master" min="0" max="100" value="70"></label>
+ </div>
+ <div class="card"><h3 style="margin-bottom:8px">Sleep timer</h3><div id="timers"></div><div class="sub" id="timerLeft"></div></div>
+ <div class="card"><h3 style="margin-bottom:8px">Presets</h3><div id="presets"></div></div>
+ <div class="grid" id="tiles"></div>
+ <div class="foot">Every sound is generated on your device, so Naptune works offline and uses almost no storage. Tip: use the Sleep screen, and lower your phone volume rather than the master volume if it is too loud.</div>
+</div>
+<div id="dim" style="position:fixed;inset:0;background:#000;display:none;z-index:200;color:#33384a;text-align:center;flex-direction:column;align-items:center;justify-content:center"><div id="dimClock" style="font-size:56px;font-weight:200"></div><div id="dimLeft" style="font-size:16px;margin-top:8px"></div><div style="font-size:12px;margin-top:40px">Tap anywhere to wake</div></div>
+
+<div class="toast" id="toast"></div>
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script>
+
+const SOUNDS=[
+ {id:'brown',name:'Brown noise',icon:'\u{1F7E4}',d:'Deep, warm rumble'},
+ {id:'pink',name:'Pink noise',icon:'\u{1F4A7}',d:'Balanced, like steady rain'},
+ {id:'white',name:'White noise',icon:'\u{1F4FB}',d:'Bright, even hiss'},
+ {id:'rain',name:'Rain',icon:'\u{1F327}',d:'Steady rain with drops'},
+ {id:'storm',name:'Thunderstorm',icon:'\u26C8',d:'Rain and distant thunder'},
+ {id:'ocean',name:'Ocean waves',icon:'\u{1F30A}',d:'Slow waves rolling in'},
+ {id:'wind',name:'Wind',icon:'\u{1F343}',d:'Soft gusts through trees'},
+ {id:'stream',name:'Brook',icon:'\u{1F3DE}',d:'Babbling stream'},
+ {id:'fan',name:'Fan',icon:'\u{1F4A8}',d:'Box fan hum'},
+ {id:'fire',name:'Campfire',icon:'\u{1F525}',d:'Warm crackling fire'},
+ {id:'crickets',name:'Crickets',icon:'\u{1F997}',d:'Summer night chirps'},
+ {id:'drone',name:'Deep space',icon:'\u{1F30C}',d:'Slow, low drifting tones'},
+ {id:'womb',name:'Heartbeat',icon:'\u{1FAC0}',d:'Gentle heartbeat and hush'},
+];
+const PRESETS=[
+ {n:'Deep sleep',m:{brown:60,fan:20}},{n:'Rainy night',m:{rain:60,storm:15,brown:20}},{n:'Ocean calm',m:{ocean:70,wind:15}},
+ {n:'Forest night',m:{wind:20,crickets:35,stream:30}},{n:'Campfire',m:{fire:55,crickets:20,wind:12}},{n:'Baby settle',m:{womb:55,pink:30}},{n:'Space',m:{drone:55,brown:20}}];
+const TIMERS=[['Off',0],['15 min',15],['30 min',30],['45 min',45],['1 hour',60],['1.5 hours',90],['2 hours',120],['8 hours',480]];
+let st=store.get('naptune.v1',{master:70,mix:{brown:60},timer:0});
+let ctx=null,master=null,comp=null,dest=null,mediaEl=null,playing=false,built={},bufs={},timerEnd=0,tick=null,fadeStarted=false;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+
+function ensure(){ if(ctx) return;
+  const AC=window.AudioContext||window.webkitAudioContext; ctx=new AC(); master=ctx.createGain(); master.gain.value=0; comp=ctx.createDynamicsCompressor(); master.connect(comp);
+  let viaEl=false;
+  if(ctx.createMediaStreamDestination && window.HTMLAudioElement){ try{ dest=ctx.createMediaStreamDestination(); mediaEl=new Audio(); mediaEl.srcObject=dest.stream; comp.connect(dest); viaEl=true; }catch(e){ viaEl=false; } }
+  if(!viaEl) comp.connect(ctx.destination); else ensure.viaEl=true; }
+function noiseBuf(type){ if(bufs[type]) return bufs[type]; const sr=ctx.sampleRate, N=sr*8, F=Math.floor(sr*0.5), b=ctx.createBuffer(2,N,sr);
+  for(let ch=0;ch<2;ch++){ const raw=new Float32Array(N+F); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0,last=0;
+    for(let i=0;i<N+F;i++){ const w=Math.random()*2-1; let o;
+      if(type==='white') o=w; else if(type==='pink'){ b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759; b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856; b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980; o=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11; b6=w*0.115926; }
+      else { last=(last+0.02*w)/1.02; o=last*3.5; } raw[i]=o; }
+    const out=b.getChannelData(ch); for(let i=0;i<N;i++) out[i]=raw[i]; for(let i=0;i<F;i++){ const t=i/F; out[i]=raw[i]*t+raw[N+i]*(1-t); } } // crossfaded so the loop has no click
+  return bufs[type]=b; }
+function loop(type){ const s=ctx.createBufferSource(); s.buffer=noiseBuf(type); s.loop=true; s.loopStart=0; s.start(0, Math.random()*4); return s; }
+const G=(v=1)=>{const g=ctx.createGain(); g.gain.value=v; return g};
+const F=(type,f,q=0.7)=>{const x=ctx.createBiquadFilter(); x.type=type; x.frequency.value=f; x.Q.value=q; return x};
+function lfo(freq,depth,target,type='sine'){ const o=ctx.createOscillator(); o.type=type; o.frequency.value=freq; const g=G(depth); o.connect(g); g.connect(target); o.start(); return o; }
+function burst(dur,fHP,peak,out){ const s=ctx.createBufferSource(); s.buffer=noiseBuf('white'); const g=G(0), f=F('highpass',fHP,0.7); s.connect(f); f.connect(g); g.connect(out); const t=ctx.currentTime; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(peak,t+dur*0.15); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); s.start(t,Math.random()*5); s.stop(t+dur+0.05); }
+// each builder returns {out:GainNode, stop():void}; the caller connects out to the sound's volume node
+const BUILD={
+ white(){ const s=loop('white'), o=G(0.28); s.connect(o); return {out:o,stop:()=>s.stop()}; },
+ pink(){ const s=loop('pink'), o=G(0.9); s.connect(o); return {out:o,stop:()=>s.stop()}; },
+ brown(){ const s=loop('brown'), o=G(0.9); s.connect(o); return {out:o,stop:()=>s.stop()}; },
+ rain(){ const s=loop('pink'), hp=F('highpass',500), lp=F('lowpass',9000), o=G(0.9); s.connect(hp); hp.connect(lp); lp.connect(o); let alive=true, t;
+   const drip=()=>{ if(!alive) return; burst(rnd(0.012,0.04),rnd(2500,6500),rnd(0.03,0.16),o); t=setTimeout(drip,rnd(25,140)); }; drip(); return {out:o,stop:()=>{alive=false;clearTimeout(t);s.stop()}}; },
+ storm(){ const r=BUILD.rain(), o=G(1); r.out.connect(o); let alive=true,t;
+   const thunder=()=>{ if(!alive) return; const s=loop('brown'), lp=F('lowpass',rnd(90,170)), g=G(0), n=ctx.currentTime; s.connect(lp); lp.connect(g); g.connect(o); g.gain.setValueAtTime(0,n); g.gain.linearRampToValueAtTime(rnd(1.2,2.2),n+rnd(0.4,1.2)); g.gain.exponentialRampToValueAtTime(0.0001,n+rnd(5,9)); setTimeout(()=>{try{s.stop()}catch(e){}},10000); t=setTimeout(thunder,rnd(14000,38000)); };
+   t=setTimeout(thunder,rnd(3000,9000)); return {out:o,stop:()=>{alive=false;clearTimeout(t);r.stop()}}; },
+ ocean(){ const s=loop('brown'), lp=F('lowpass',850), g=G(0.5), o=G(1); s.connect(lp); lp.connect(g); g.connect(o); const l1=lfo(0.085,0.38,g.gain);
+   const s2=loop('pink'), bp=F('bandpass',1600,0.6), g2=G(0.12); s2.connect(bp); bp.connect(g2); g2.connect(o); const l2=lfo(0.085,0.1,g2.gain), l3=lfo(0.05,500,bp.frequency);
+   return {out:o,stop:()=>{[s,s2,l1,l2,l3].forEach(x=>{try{x.stop()}catch(e){}})}}; },
+ wind(){ const s=loop('pink'), bp=F('bandpass',420,0.9), g=G(1.4), o=G(1); s.connect(bp); bp.connect(g); g.connect(o); const l1=lfo(0.07,260,bp.frequency), l2=lfo(0.11,0.35,g.gain), l3=lfo(0.031,0.15,g.gain);
+   return {out:o,stop:()=>{[s,l1,l2,l3].forEach(x=>{try{x.stop()}catch(e){}})}}; },
+ stream(){ const s=loop('white'), bp=F('bandpass',2600,0.8), g=G(0.55), o=G(1); s.connect(bp); bp.connect(g); g.connect(o); const l1=lfo(0.4,900,bp.frequency), l2=lfo(1.3,0.15,g.gain);
+   const s2=loop('white'), hp=F('highpass',5200), g2=G(0.12); s2.connect(hp); hp.connect(g2); g2.connect(o); const l3=lfo(0.7,0.08,g2.gain);
+   return {out:o,stop:()=>{[s,s2,l1,l2,l3].forEach(x=>{try{x.stop()}catch(e){}})}}; },
+ fan(){ const s=loop('pink'), lp=F('lowpass',1300), o=G(0.9); s.connect(lp); lp.connect(o); const h=ctx.createOscillator(); h.type='sine'; h.frequency.value=118; const hg=G(0.05); h.connect(hg); hg.connect(o); h.start(); const l=lfo(5.5,0.04,o.gain);
+   return {out:o,stop:()=>{[s,h,l].forEach(x=>{try{x.stop()}catch(e){}})}}; },
+ fire(){ const s=loop('brown'), lp=F('lowpass',380), o=G(1), g=G(0.55); s.connect(lp); lp.connect(g); g.connect(o); let alive=true,t;
+   const crack=()=>{ if(!alive) return; burst(rnd(0.004,0.03),rnd(1200,3500),rnd(0.12,0.7),o); if(Math.random()<0.25) burst(rnd(0.003,0.012),rnd(3000,6000),rnd(0.1,0.4),o); t=setTimeout(crack,rnd(60,520)); }; crack();
+   return {out:o,stop:()=>{alive=false;clearTimeout(t);s.stop()}}; },
+ crickets(){ const o=G(1.5); let alive=true,t; const chirp=()=>{ if(!alive) return; const base=rnd(4000,5200), n=ctx.currentTime, pulses=rnd(3,5)|0, osc=ctx.createOscillator(), g=G(0); osc.type='sine'; osc.frequency.value=base; osc.connect(g); g.connect(o); g.gain.setValueAtTime(0,n);
+     for(let i=0;i<pulses;i++){ const p=n+i*0.045; g.gain.linearRampToValueAtTime(0.18,p+0.012); g.gain.linearRampToValueAtTime(0.02,p+0.035); } g.gain.linearRampToValueAtTime(0,n+pulses*0.045+0.03); osc.start(n); osc.stop(n+pulses*0.045+0.08); t=setTimeout(chirp,rnd(180,1100)); }; chirp();
+   return {out:o,stop:()=>{alive=false;clearTimeout(t)}}; },
+ drone(){ const o=G(0.5), lp=F('lowpass',420), oscs=[55,82.41,110.4,164.9].map((f,i)=>{ const x=ctx.createOscillator(); x.type=i%2?'triangle':'sine'; x.frequency.value=f*(1+rnd(-0.002,0.002)); const g=G(0.16/(i+1)*1.4); x.connect(g); g.connect(lp); x.start(); lfo(0.03+i*0.013,0.06,g.gain); return x; }); lp.connect(o);
+   return {out:o,stop:()=>oscs.forEach(x=>{try{x.stop()}catch(e){}})}; },
+ womb(){ const s=loop('brown'), lp=F('lowpass',320), o=G(1), bed=G(0.6); s.connect(lp); lp.connect(bed); bed.connect(o); let alive=true,t;
+   const thump=(at,amp)=>{ const x=ctx.createOscillator(), g=G(0); x.type='sine'; x.frequency.setValueAtTime(70,at); x.frequency.exponentialRampToValueAtTime(38,at+0.12); x.connect(g); g.connect(o); g.gain.setValueAtTime(0,at); g.gain.linearRampToValueAtTime(amp,at+0.02); g.gain.exponentialRampToValueAtTime(0.0001,at+0.2); x.start(at); x.stop(at+0.25); };
+   const beat=()=>{ if(!alive) return; const n=ctx.currentTime+0.05; thump(n,0.9); thump(n+0.26,0.6); t=setTimeout(beat,rnd(820,900)); }; beat();
+   return {out:o,stop:()=>{alive=false;clearTimeout(t);s.stop()}}; },
+};
+function startSound(id){ if(built[id]||!ctx) return; const b=BUILD[id](), vol=G((st.mix[id]||50)/100); b.out.connect(vol); vol.connect(master); built[id]={b,vol}; }
+function stopSound(id){ const x=built[id]; if(!x) return; try{ x.vol.gain.setTargetAtTime(0,ctx.currentTime,0.15); }catch(e){} setTimeout(()=>{try{x.b.stop()}catch(e){} try{x.vol.disconnect()}catch(e){}},700); delete built[id]; }
+
+async function play(){ ensure(); try{ await ctx.resume(); }catch(e){} if(mediaEl){ try{ await mediaEl.play(); }catch(e){ try{ comp.disconnect(dest); }catch(x){} comp.connect(ctx.destination); } }
+  playing=true; fadeStarted=false; Object.keys(st.mix).forEach(startSound); master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0,ctx.currentTime); master.gain.linearRampToValueAtTime(st.master/100,ctx.currentTime+4);
+  if(st.timer) timerEnd=Date.now()+st.timer*60000; else timerEnd=0; startTick(); ui(); mediaSession(); }
+function stopAll(fade=true){ if(!ctx){ playing=false; ui(); return; } const t=ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value,t); master.gain.linearRampToValueAtTime(0,t+(fade?2:0.05));
+  setTimeout(()=>{ Object.keys(built).forEach(id=>{try{built[id].b.stop()}catch(e){} try{built[id].vol.disconnect()}catch(e){} delete built[id]}); if(mediaEl) mediaEl.pause(); try{ctx.suspend()}catch(e){} },fade?2100:100);
+  playing=false; timerEnd=0; clearInterval(tick); tick=null; ui(); }
+function startTick(){ clearInterval(tick); tick=setInterval(()=>{ if(!playing){clearInterval(tick);return}
+  if(timerEnd){ const left=timerEnd-Date.now(); if(left<=0){ stopAll(false); toast('Sleep timer finished'); return; } if(left<=30000&&!fadeStarted){ fadeStarted=true; const t=ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value,t); master.gain.linearRampToValueAtTime(0,t+left/1000); } }
+  ui(); },1000); }
+const fmt=ms=>{const s=Math.max(0,Math.round(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
+function mediaSession(){ if(!('mediaSession' in navigator)) return; try{ navigator.mediaSession.metadata=new MediaMetadata({title:'Naptune',artist:Object.keys(st.mix).map(id=>SOUNDS.find(s=>s.id===id).name).join(', '),album:'Sleep sounds',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]}); navigator.mediaSession.setActionHandler('play',()=>play()); navigator.mediaSession.setActionHandler('pause',()=>stopAll(true)); navigator.mediaSession.setActionHandler('stop',()=>stopAll(true)); }catch(e){} }
+
+// ---------- UI ----------
+function ui(){
+  const n=Object.keys(st.mix).length;
+  $('#btnPlay').innerHTML=playing?'&#10074;&#10074;':'&#9654;';
+  $('#status').textContent=playing?`Playing ${n} sound${n===1?'':'s'}${timerEnd?' · stops in '+fmt(timerEnd-Date.now()):''}`:(n?`${n} sound${n===1?'':'s'} ready: press play`:'Pick a few sounds, then press play');
+  $('#timerLeft').textContent=timerEnd?'Fades out and stops in '+fmt(timerEnd-Date.now()):(st.timer?'Timer starts when you press play':'');
+  $('#dimClock').textContent=new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); $('#dimLeft').textContent=timerEnd?'Stops in '+fmt(timerEnd-Date.now()):'';
+}
+function tiles(){
+  $('#tiles').innerHTML=SOUNDS.map(s=>{const on=st.mix[s.id]!=null;return `<div class="card" style="margin:0;${on?'border-color:var(--accent)':''}"><div class="row" data-t="${s.id}" style="cursor:pointer"><div style="font-size:28px">${s.icon}</div><div class="grow"><h3>${esc(s.name)}</h3><div class="sub">${esc(s.d)}</div></div><span class="chip ${on?'on':''}" style="margin:0">${on?'On':'Off'}</span></div>${on?`<input type="range" min="5" max="100" value="${st.mix[s.id]}" data-v="${s.id}" style="margin-top:10px" aria-label="${esc(s.name)} volume">`:''}</div>`}).join('');
+  $$('[data-t]').forEach(el=>el.onclick=()=>toggle(el.dataset.t));
+  $$('[data-v]').forEach(el=>el.oninput=()=>{ st.mix[el.dataset.v]=+el.value; if(built[el.dataset.v]) built[el.dataset.v].vol.gain.setTargetAtTime(+el.value/100,ctx.currentTime,0.05); save(); });
+}
+function toggle(id){ if(st.mix[id]!=null){ delete st.mix[id]; if(playing) stopSound(id); } else { st.mix[id]=55; if(playing) startSound(id); } save(); tiles(); ui(); }
+function applyPreset(p){ if(playing) Object.keys(st.mix).forEach(stopSound); st.mix={...p.m}; if(playing) Object.keys(st.mix).forEach(startSound); save(); tiles(); ui(); toast(p.n); }
+const save=()=>store.set('naptune.v1',st);
+$('#presets').innerHTML=PRESETS.map((p,i)=>`<span class="chip" data-p="${i}">${esc(p.n)}</span>`).join(''); $$('[data-p]').forEach(el=>el.onclick=()=>applyPreset(PRESETS[+el.dataset.p]));
+function timers(){ $('#timers').innerHTML=TIMERS.map(t=>`<span class="chip ${st.timer===t[1]?'on':''}" data-m="${t[1]}">${t[0]}</span>`).join(''); $$('[data-m]').forEach(el=>el.onclick=()=>{ st.timer=+el.dataset.m; if(playing){ timerEnd=st.timer?Date.now()+st.timer*60000:0; fadeStarted=false; if(ctx){ const t=ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value,t); master.gain.linearRampToValueAtTime(st.master/100,t+1); } } save(); timers(); ui(); }); }
+$('#btnPlay').onclick=()=>playing?stopAll(true):play();
+$('#master').value=st.master; $('#master').oninput=e=>{ st.master=+e.target.value; save(); if(playing&&ctx&&!fadeStarted) master.gain.setTargetAtTime(st.master/100,ctx.currentTime,0.05); };
+$('#btnDim').onclick=()=>{ $('#dim').style.display='flex'; ui(); }; $('#dim').onclick=()=>{ $('#dim').style.display='none'; };
+setInterval(()=>{ if($('#dim').style.display==='flex') ui(); },5000);
+window.__naptune={get comp(){return comp},SOUNDS,BUILD,get st(){return st},get ctx(){return ctx},get built(){return Object.keys(built)},get playing(){return playing},play,stopAll,toggle,get viaEl(){return !!ensure.viaEl}};
+tiles(); timers(); ui();
+
+</script></body></html>
